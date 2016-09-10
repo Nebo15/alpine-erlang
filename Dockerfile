@@ -1,4 +1,4 @@
-FROM janeczku/alpine-kubernetes:3.4
+FROM alpine:3.4
 
 MAINTAINER Paul Schoenfelder <paulschoenfelder@gmail.com>
 MAINTAINER Nebo #15 <support@nebo15.com>
