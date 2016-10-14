@@ -7,7 +7,7 @@ MAINTAINER Nebo #15 <support@nebo15.com>
 # is updated with the current date. It will force refresh of all
 # of the base images and things like `apt-get update` won't be using
 # old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT=2016-06-07 \
+ENV REFRESHED_AT=2016-10-14 \
     LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
