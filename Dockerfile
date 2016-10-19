@@ -10,7 +10,7 @@ MAINTAINER Nebo #15 <support@nebo15.com>
 ENV REFRESHED_AT=2016-10-19 \
     LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
-    OTP_VERSION=19.0.7 \
+    OTP_VERSION=19.0.1 \
     # Set this so that CTRL+G works properly
     TERM=xterm
 
