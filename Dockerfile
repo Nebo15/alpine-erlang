@@ -83,6 +83,7 @@ RUN \
     cd $HOME && \
     rm -rf /tmp/erlang-build && \
     # Update ca certificates
+    rm -rf /var/cache/apk/* && \
     update-ca-certificates --fresh
 
 WORKDIR ${HOME}
