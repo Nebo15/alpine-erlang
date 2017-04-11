@@ -18,13 +18,12 @@ RUN \
     mkdir -p ${HOME} && \
     adduser -s /bin/sh -u 1001 -G root -h ${HOME} -S -D default && \
     chown -R 1001:0 ${HOME} && \
-    apk --no-cache upgrade && \
-    apk-install ca-certificates \
-                     erlang erlang-dev erlang-kernel erlang-hipe erlang-compiler \
-                     erlang-stdlib erlang-erts erlang-syntax-tools erlang-sasl \
-                     erlang-crypto erlang-public-key erlang-ssl erlang-tools \
-                     erlang-inets erlang-mnesia erlang-odbc erlang-xmerl erlang-runtime-tools \
-                     erlang-erl-interface erlang-parsetools erlang-asn1 && \
+    apk --no-cache --upgrade add ca-certificates \
+                                 erlang erlang-dev erlang-kernel erlang-hipe erlang-compiler \
+                                 erlang-stdlib erlang-erts erlang-syntax-tools erlang-sasl \
+                                 erlang-crypto erlang-public-key erlang-ssl erlang-tools \
+                                 erlang-inets erlang-mnesia erlang-odbc erlang-xmerl erlang-runtime-tools \
+                                 erlang-erl-interface erlang-parsetools erlang-asn1 && \
     update-ca-certificates --fresh
 
 WORKDIR ${HOME}
