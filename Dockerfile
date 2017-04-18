@@ -77,9 +77,9 @@ RUN set -xe && \
       --enable-sctp \
       --enable-hipe \
       --enable-dirty-schedulers \
-      --enable-new-purge-strategy
+      --enable-new-purge-strategy && \
     # Build
-RUN set -xe && \
+    set -xe && \
     make -j4 && make install && \
     # Cleanup
     apk del --force .erlang-build && \
