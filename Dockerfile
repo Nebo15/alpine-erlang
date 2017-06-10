@@ -29,17 +29,14 @@ RUN set -xe && \
     apk add --no-cache --virtual .fetch-deps curl && \
     curl -fSL -o otp-src.tar.gz "${OTP_DOWNLOAD_URL}" && \
     # Install Erlang/OTP build deps
-    apk add --virtual .erlang-rundeps \
+    apk add --no-cache --update --virtual .build-deps \
+      pcre@edge \
       openssl-dev \
       ncurses-dev \
-      unixodbc-dev \
-      pcre@edge \
-      zlib-dev && \
-    apk add --no-cache --virtual .build-deps \
+      zlib-dev \
       gcc \
       perl-dev \
       libc-dev \
-      unixodbc-dev \
       make \
       autoconf \
       tar && \
@@ -48,7 +45,7 @@ RUN set -xe && \
   tar -xzf otp-src.tar.gz -C $ERL_TOP --strip-components=1 && \
   rm otp-src.tar.gz && \
   ( cd $ERL_TOP && \
-    export OTP_SMALL_BUILD=true && \
+    # export OTP_SMALL_BUILD=true && \
     export CPPFlAGS="-D_BSD_SOURCE $CPPFLAGS" && \
     ./otp_build autoconf && \
     ./configure \
@@ -81,7 +78,7 @@ RUN set -xe && \
       --enable-dirty-schedulers \
       --enable-new-purge-strategy && \
     make -j$(getconf _NPROCESSORS_ONLN) && \
-    make install )&& \
+    make install ) && \
   rm -rf $ERL_TOP && \
   find /usr/local -regex '/usr/local/lib/erlang/\(lib/\|erts-\).*/\(man\|doc\|src\|info\|include\|examples\)' | xargs rm -rf && \
   rm -rf /usr/local/lib/erlang/lib/*tools* \
