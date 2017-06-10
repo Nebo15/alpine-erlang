@@ -1,5 +1,4 @@
 FROM alpine:3.6
-
 MAINTAINER Nebo #15 <support@nebo15.com>
 
 # Important!  Update this no-op ENV variable when this Dockerfile
