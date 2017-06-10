@@ -94,7 +94,6 @@ RUN set -xe && \
   ) && \
   apk add --virtual .erlang-rundeps $runDeps && \
   apk del .fetch-deps .build-deps && \
-  export PATH=$ERL_TOP/bin:$PATH && \
     # Update CA certificates
     update-ca-certificates --fresh
 
