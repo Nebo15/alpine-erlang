@@ -1,2 +1,3 @@
 # alpine-erlang
-Erlang container based on Alpine Linux with Kubernetes support.
+
+Minimalistic Erlang container based on Alpine Linux.

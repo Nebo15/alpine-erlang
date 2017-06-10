@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine:3.6
 
 MAINTAINER Nebo #15 <support@nebo15.com>
 
@@ -6,19 +6,18 @@ MAINTAINER Nebo #15 <support@nebo15.com>
 # is updated with the current date. It will force refresh of all
 # of the base images and things like `apt-get update` won't be using
 # old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT=2017-04-18 \
+ENV REFRESHED_AT=2017-06-10 \
     LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=19.3.1
+    OTP_VERSION=19.3.4
 
 WORKDIR /tmp/erlang-build
 
 # Install Erlang
 RUN set -xe && \
     OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" && \
-    OTP_DOWNLOAD_SHA256="618f19e4274150a107bea7621d871d96d386291759ffb57d1a3e60f1f243a509" && \
     # Create default user and home directory, set owner to default
     mkdir -p ${HOME} && \
     adduser -s /bin/sh -u 1001 -G root -h ${HOME} -S -D default && \
@@ -26,31 +25,28 @@ RUN set -xe && \
     # Add edge repos tagged so that we can selectively install edge packages
     echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
-    apk --no-cache upgrade && \
-    # Install Erlang/OTP deps
-    apk add --no-cache pcre@edge && \
-    apk add --no-cache \
-      ca-certificates \
-      openssl-dev \
-      ncurses-dev \
-      unixodbc-dev \
-      zlib-dev && \
-    # Install Erlang/OTP build deps
-    apk add --no-cache --virtual .erlang-build \
-      autoconf curl \
-      build-base perl-dev && \
-    # Download and validate Erlang/OTP checksum
+    apk add --no-cache --update ca-certificates && \
+    # Install fetch deps
+    apk add --no-cache --virtual .fetch-deps curl && \
     curl -fSL -o otp-src.tar.gz "${OTP_DOWNLOAD_URL}" && \
-    # echo "$OTP_DOWNLOAD_SHA256 otp-src.tar.gz" | sha256sum -c - && \
-    tar -xzf otp-src.tar.gz -C /tmp/erlang-build --strip-components=1 && \
-    rm otp-src.tar.gz && \
-    # Erlang/OTP build env
-    export ERL_TOP=/tmp/erlang-build && \
-    export PATH=$ERL_TOP/bin:$PATH && \
+    # Install Erlang/OTP build deps
+    apk add --no-cache --virtual .build-deps \
+      gcc \
+      libc-dev \
+      make \
+      autoconf \
+      ncurses-dev \
+      tar && \
+  export ERL_TOP="/usr/src/otp_src_${OTP_VERSION%%@*}" && \
+  mkdir -vp $ERL_TOP && \
+  tar -xzf otp-src.tar.gz -C $ERL_TOP --strip-components=1 && \
+  rm otp-src.tar.gz && \
+  ( cd $ERL_TOP && \
+    export OTP_SMALL_BUILD=true && \
     export CPPFlAGS="-D_BSD_SOURCE $CPPFLAGS" && \
-    # Configure
     ./otp_build autoconf && \
-    ./configure --prefix=/usr \
+    ./configure \
+      --prefix=/usr/local \
       --sysconfdir=/etc \
       --mandir=/usr/share/man \
       --infodir=/usr/share/info \
@@ -78,14 +74,28 @@ RUN set -xe && \
       --enable-hipe \
       --enable-dirty-schedulers \
       --enable-new-purge-strategy && \
-    # Build
-    set -xe && \
-    make -j4 && make install && \
-    # Cleanup
-    apk del --force .erlang-build && \
-    cd $HOME && \
-    rm -rf /tmp/erlang-build && \
-    find /usr/local -name examples | xargs rm -rf && \
+    make -j$(getconf _NPROCESSORS_ONLN) && \
+    make install )&& \
+  rm -rf $ERL_TOP && \
+  find /usr/local -regex '/usr/local/lib/erlang/\(lib/\|erts-\).*/\(man\|doc\|src\|info\|include\|examples\)' | xargs rm -rf && \
+  rm -rf /usr/local/lib/erlang/lib/*tools* \
+    /usr/local/lib/erlang/lib/*test* \
+    /usr/local/lib/erlang/usr \
+    /usr/local/lib/erlang/misc \
+    /usr/local/lib/erlang/erts*/lib/lib*.a \
+    /usr/local/lib/erlang/erts*/lib/internal && \
+  scanelf --nobanner -E ET_EXEC -BF '%F' --recursive /usr/local | xargs strip --strip-all && \
+  scanelf --nobanner -E ET_DYN -BF '%F' --recursive /usr/local | xargs -r strip --strip-unneeded && \
+  runDeps=$( \
+    scanelf --needed --nobanner --recursive /usr/local \
+      | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+      | sort -u \
+      | xargs -r apk info --installed \
+      | sort -u \
+  ) && \
+  apk add --virtual .erlang-rundeps $runDeps && \
+  apk del .fetch-deps .build-deps && \
+  export PATH=$ERL_TOP/bin:$PATH && \
     # Update CA certificates
     update-ca-certificates --fresh
 
