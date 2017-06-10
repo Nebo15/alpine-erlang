@@ -10,7 +10,7 @@ ENV REFRESHED_AT=2017-06-10 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=20.0-rc2
+    OTP_VERSION=19.3.4
 
 WORKDIR /tmp/erlang-build
 
@@ -32,10 +32,14 @@ RUN set -xe && \
     apk add --no-cache --virtual .build-deps \
       gcc \
       libc-dev \
+      openssl-dev \
+      unixodbc-dev \
+      zlib-dev \
       make \
       autoconf \
       ncurses-dev \
-      tar && \
+      tar \
+      pcre@edge && \
   export ERL_TOP="/usr/src/otp_src_${OTP_VERSION%%@*}" && \
   mkdir -vp $ERL_TOP && \
   tar -xzf otp-src.tar.gz -C $ERL_TOP --strip-components=1 && \
