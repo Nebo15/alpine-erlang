@@ -10,7 +10,7 @@ ENV REFRESHED_AT=2017-06-10 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=20.0-rc2
+    OTP_VERSION=19.3.4
 
 WORKDIR /tmp/erlang-build
 
@@ -29,17 +29,20 @@ RUN set -xe && \
     apk add --no-cache --virtual .fetch-deps curl && \
     curl -fSL -o otp-src.tar.gz "${OTP_DOWNLOAD_URL}" && \
     # Install Erlang/OTP build deps
+    apk add --virtual .erlang-rundeps \
+      openssl-dev \
+      ncurses-dev \
+      unixodbc-dev \
+      pcre@edge \
+      zlib-dev && \
     apk add --no-cache --virtual .build-deps \
       gcc \
+      perl-dev \
       libc-dev \
-      openssl-dev \
       unixodbc-dev \
-      zlib-dev \
       make \
       autoconf \
-      ncurses-dev \
-      tar \
-      pcre@edge && \
+      tar && \
   export ERL_TOP="/usr/src/otp_src_${OTP_VERSION%%@*}" && \
   mkdir -vp $ERL_TOP && \
   tar -xzf otp-src.tar.gz -C $ERL_TOP --strip-components=1 && \
@@ -98,8 +101,9 @@ RUN set -xe && \
   ) && \
   apk add --virtual .erlang-rundeps $runDeps && \
   apk del .fetch-deps .build-deps && \
-    # Update CA certificates
-    update-ca-certificates --fresh
+  rm -rf /var/cache/apk/* && \
+  # Update CA certificates
+  update-ca-certificates --fresh
 
 WORKDIR ${HOME}
 
