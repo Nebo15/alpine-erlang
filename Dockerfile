@@ -85,7 +85,7 @@ RUN set -xe && \
     make -j$(getconf _NPROCESSORS_ONLN) && \
     make install ) && \
   rm -rf $ERL_TOP && \
-  find /usr/local -regex '/usr/local/lib/erlang/\(lib/\|erts-\).*/\(man\|doc\|src\|info\|include\|examples\)' | xargs rm -rf && \
+  find /usr/local -regex '/usr/local/lib/erlang/\(lib/\|erts-\).*/\(man\|doc\|src\|info\|examples\)' | xargs rm -rf && \
   rm -rf /usr/local/lib/erlang/lib/*test* \
     /usr/local/lib/erlang/usr \
     /usr/local/lib/erlang/misc \
