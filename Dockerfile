@@ -10,7 +10,7 @@ ENV REFRESHED_AT=2017-06-10 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=20.0-rc2
+    OTP_VERSION=19.3.4
 
 WORKDIR /tmp/erlang-build
 
@@ -39,6 +39,7 @@ RUN set -xe && \
       libc-dev \
       make \
       autoconf \
+      build-base \
       tar && \
   export ERL_TOP="/usr/src/otp_src_${OTP_VERSION%%@*}" && \
   mkdir -vp $ERL_TOP && \
@@ -62,6 +63,8 @@ RUN set -xe && \
       --without-cosProperty \
       --without-cosTime \
       --without-cosTransactions \
+      --without-dialyzer \
+      --without-et \
       --without-gs \
       --without-ic \
       --without-megaco \
@@ -75,8 +78,7 @@ RUN set -xe && \
       --enable-ssl=dynamic-ssl-lib \
       --enable-sctp \
       --enable-hipe \
-      --enable-dirty-schedulers \
-      --enable-new-purge-strategy && \
+      --enable-dirty-schedulers && \
     make -j$(getconf _NPROCESSORS_ONLN) && \
     make install ) && \
   rm -rf $ERL_TOP && \
