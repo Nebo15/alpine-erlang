@@ -83,8 +83,7 @@ RUN set -xe && \
     make install ) && \
   rm -rf $ERL_TOP && \
   find /usr/local -regex '/usr/local/lib/erlang/\(lib/\|erts-\).*/\(man\|doc\|src\|info\|include\|examples\)' | xargs rm -rf && \
-  rm -rf /usr/local/lib/erlang/lib/*tools* \
-    /usr/local/lib/erlang/lib/*test* \
+  rm -rf /usr/local/lib/erlang/lib/*test* \
     /usr/local/lib/erlang/usr \
     /usr/local/lib/erlang/misc \
     /usr/local/lib/erlang/erts*/lib/lib*.a \
