@@ -56,6 +56,9 @@ RUN set -xe && \
       --infodir=/usr/share/info \
       --without-javac \
       --without-jinterface \
+      --without-wx \
+      --without-debugger \
+      --without-observer \
       --without-cosEvent \
       --without-cosEventDomain \
       --without-cosFileTransfer \
