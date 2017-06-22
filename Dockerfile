@@ -10,7 +10,7 @@ ENV REFRESHED_AT=2017-06-10 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=19.3.4
+    OTP_VERSION=20.0
 
 WORKDIR /tmp/erlang-build
 
@@ -23,10 +23,8 @@ RUN set -xe && \
     chown -R 1001:0 ${HOME} && \
     # Add edge repos tagged so that we can selectively install edge packages
     echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
-    # Upgrade Alpine and base packages
-    apk add --no-cache --update ca-certificates && \
     # Install fetch deps
-    apk add --no-cache --virtual .fetch-deps curl && \
+    apk add --no-cache --update --virtual .fetch-deps curl ca-certificates && \
     curl -fSL -o otp-src.tar.gz "${OTP_DOWNLOAD_URL}" && \
     # Install Erlang/OTP build deps
     apk add --no-cache --update --virtual .build-deps \
