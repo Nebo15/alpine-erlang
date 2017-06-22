@@ -23,8 +23,10 @@ RUN set -xe && \
     chown -R 1001:0 ${HOME} && \
     # Add edge repos tagged so that we can selectively install edge packages
     echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
+    # Upgrade Alpine and base packages
+    apk add --no-cache --update ca-certificates && \
     # Install fetch deps
-    apk add --no-cache --update --virtual .fetch-deps curl ca-certificates && \
+    apk add --no-cache --update --virtual .fetch-deps curl && \
     curl -fSL -o otp-src.tar.gz "${OTP_DOWNLOAD_URL}" && \
     # Install Erlang/OTP build deps
     apk add --no-cache --update --virtual .build-deps \
