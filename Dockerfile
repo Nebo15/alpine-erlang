@@ -24,7 +24,7 @@ RUN set -xe && \
     # Add edge repos tagged so that we can selectively install edge packages
     echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
-    apk add --no-cache --update ca-certificates && \
+    apk add --no-cache --update ca-certificates musl=1.1.16-r13 && \
     # Install fetch deps
     apk add --no-cache --update --virtual .fetch-deps curl && \
     curl -fSL -o otp-src.tar.gz "${OTP_DOWNLOAD_URL}" && \
