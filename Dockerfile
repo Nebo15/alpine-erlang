@@ -25,15 +25,15 @@ RUN set -xe && \
     # Add edge repos tagged so that we can selectively install edge packages
     echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
-    apk add --no-cache --update ca-certificates musl>=1.1.16-r13 && \
+    apk add --no-cache --update ca-certificates musl>1.1.16-r13 && \
     # Install fetch deps
     apk add --no-cache --update --virtual .fetch-deps curl && \
     curl -fSL -o otp-src.tar.gz "${OTP_DOWNLOAD_URL}" && \
     # Install Erlang/OTP build deps
     apk add --no-cache --update --virtual .build-deps \
-      pcre@edge>=8.41-r1 \
+      pcre@edge>8.41-r1 \
       openssl-dev \
-      ncurses-dev@edge>=6.0-r8 \
+      ncurses-dev@edge>6.0-r8 \
       zlib-dev \
       gcc \
       perl-dev \
