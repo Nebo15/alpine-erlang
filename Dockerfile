@@ -5,13 +5,13 @@ MAINTAINER Nebo #15 <support@nebo15.com>
 # is updated with the current date. It will force refresh of all
 # of the base images and things like `apt-get update` won't be using
 # old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT=2017-09-03
+ENV REFRESHED_AT=2017-10-15
 
 ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=20.0.4
+    OTP_VERSION=20.1.2
 
 WORKDIR /tmp/erlang-build
 
