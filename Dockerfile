@@ -15,6 +15,14 @@ ENV LANG=en_US.UTF-8 \
 
 WORKDIR /tmp/erlang-build
 
+# Update Alpine base libs
+RUN set -xe && \
+    # Add edge repos tagged so that we can selectively install edge packages
+    echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
+    # Upgrade Alpine and base packages
+    apk add --no-cache --update apk-tools@edge && \
+    apk add --no-cache --update musl@edge=1.1.18-r3 ca-certificates
+
 # Install Erlang
 RUN set -xe && \
     OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" && \
@@ -22,10 +30,6 @@ RUN set -xe && \
     mkdir -p ${HOME} && \
     adduser -s /bin/sh -u 1001 -G root -h ${HOME} -S -D default && \
     chown -R 1001:0 ${HOME} && \
-    # Add edge repos tagged so that we can selectively install edge packages
-    echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
-    # Upgrade Alpine and base packages
-    apk add --no-cache --update ca-certificates && \
     # Install fetch deps
     apk add --no-cache --update --virtual .fetch-deps curl && \
     # Install Erlang/OTP build deps
