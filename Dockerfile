@@ -11,7 +11,8 @@ ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=21.0
+    OTP_VERSION=21.0 \
+    OTP_DOWNLOAD_SHA256=5a2d8e33c39a78a2dcc0c39bf9d2dfdf2974f0fad28385b4ede020a2321d643f
 
 WORKDIR /tmp/erlang-build
 
@@ -20,7 +21,7 @@ RUN set -xe && \
     # Add edge repos tagged so that we can selectively install edge packages
     echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
-    apk add --no-cache --update apk-tools@edge && \
+    apk add --no-cache --update apk-tools=2.9.1-r2 && \
     apk add --no-cache --update musl@edge=1.1.18-r3 ca-certificates
 
 # Install Erlang
@@ -34,19 +35,23 @@ RUN set -xe && \
     apk add --no-cache --update --virtual .fetch-deps curl && \
     # Install Erlang/OTP build deps
     apk add --no-cache --update --virtual .build-deps \
-      pcre \
+      build-base \
+      dpkg-dev dpkg \
+      pcre@edge \
       openssl-dev \
       ncurses-dev \
       zlib-dev \
-      gcc \
+      gcc g++ libc-dev \
+      linux-headers \
       perl-dev \
-      libc-dev \
       make \
       autoconf \
-      build-base \
+      unixodbc-dev \
+      lksctp-tools-dev \
       tar && \
     # Download Erlang/OTP
     curl -fSL -o otp-src.tar.gz "${OTP_DOWNLOAD_URL}" && \
+    echo "$OTP_DOWNLOAD_SHA256  otp-src.tar.gz" | sha256sum -c - && \
     export ERL_TOP="/usr/src/otp_src_${OTP_VERSION%%@*}" && \
     mkdir -vp $ERL_TOP && \
     tar -xzf otp-src.tar.gz -C $ERL_TOP --strip-components=1 && \
@@ -54,8 +59,10 @@ RUN set -xe && \
     ( cd $ERL_TOP && \
       # export OTP_SMALL_BUILD=true && \
       export CPPFlAGS="-D_BSD_SOURCE $CPPFLAGS" && \
+      export gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" && \
       ./otp_build autoconf && \
       ./configure \
+        --build="$gnuArch" \
         --prefix=/usr/local \
         --sysconfdir=/etc \
         --mandir=/usr/share/man \
@@ -97,20 +104,20 @@ RUN set -xe && \
       /usr/local/lib/erlang/misc \
       /usr/local/lib/erlang/erts*/lib/lib*.a \
       /usr/local/lib/erlang/erts*/lib/internal && \
-    scanelf --nobanner -E ET_EXEC -BF '%F' --recursive /usr/local | xargs strip --strip-all && \
+    scanelf --nobanner -E ET_EXEC -BF '%F' --recursive /usr/local | xargs -r strip --strip-all && \
     scanelf --nobanner -E ET_DYN -BF '%F' --recursive /usr/local | xargs -r strip --strip-unneeded && \
-    runDeps=$( \
-      scanelf --needed --nobanner --recursive /usr/local \
-        | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-        | sort -u \
-        | xargs -r apk info --installed \
-        | sort -u \
-    ) && \
-    apk add --virtual .erlang-rundeps $runDeps && \
+    runDeps="$( \
+  		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+  			| tr ',' '\n' \
+  			| sort -u \
+  			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+  	)" && \
+    apk add --virtual .erlang-rundeps $runDeps lksctp-tools && \
     apk del .fetch-deps .build-deps && \
-    rm -rf /var/cache/apk/* && \
-    # Update CA certificates
-    update-ca-certificates --fresh
+    rm -rf /var/cache/apk/*
+
+# Update CA certificates
+RUN update-ca-certificates --fresh
 
 WORKDIR ${HOME}
 
