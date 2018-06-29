@@ -11,8 +11,8 @@ ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=21.0 \
-    OTP_DOWNLOAD_SHA256=5a2d8e33c39a78a2dcc0c39bf9d2dfdf2974f0fad28385b4ede020a2321d643f
+    OTP_VERSION=21.0.1 \
+    OTP_DOWNLOAD_SHA256=65a5f1c54bd52a5e9840cda536a2b37611bb08ab869295bba812c06c2bc7c9bc
 
 WORKDIR /tmp/erlang-build
 
