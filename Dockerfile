@@ -1,18 +1,18 @@
-FROM alpine:3.7
+FROM alpine:3.8
 MAINTAINER Nebo #15 <support@nebo15.com>
 
 # Important! Update this no-op ENV variable when this Dockerfile
 # is updated with the current date. It will force refresh of all
 # of the base images and things like `apt-get update` won't be using
 # old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT=2018-06-20
+ENV REFRESHED_AT=2018-07-16
 
 ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=21.0.1 \
-    OTP_DOWNLOAD_SHA256=65a5f1c54bd52a5e9840cda536a2b37611bb08ab869295bba812c06c2bc7c9bc
+    OTP_VERSION=21.0.3 \
+    OTP_DOWNLOAD_SHA256=81ed829f829d53ce7dd7e3808eb3162ef672d52bd3ebc1ad1b6c6dafc06cc324
 
 WORKDIR /tmp/erlang-build
 
@@ -21,8 +21,7 @@ RUN set -xe && \
     # Add edge repos tagged so that we can selectively install edge packages
     echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
-    apk add --no-cache --update apk-tools=2.9.1-r2 && \
-    apk add --no-cache --update musl@edge=1.1.18-r3 ca-certificates
+    apk add --no-cache --update apk-tools musl ca-certificates
 
 # Install Erlang
 RUN set -xe && \
@@ -37,7 +36,7 @@ RUN set -xe && \
     apk add --no-cache --update --virtual .build-deps \
       build-base \
       dpkg-dev dpkg \
-      pcre@edge \
+      pcre \
       openssl-dev \
       ncurses-dev \
       zlib-dev \
