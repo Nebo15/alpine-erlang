@@ -11,15 +11,15 @@ ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=21.0.5 \
-    OTP_DOWNLOAD_SHA256=70124f91693364f7fd2ec65baa45c434f069a14f5aa2c18377e1c3f320f47ac5
+    OTP_VERSION=21.1 \
+    OTP_DOWNLOAD_SHA256=7212f895ae317fa7a086fa2946070de5b910df5d41263e357d44b0f1f410af0f
 
 WORKDIR /tmp/erlang-build
 
 # Update Alpine base libs
 RUN set -xe && \
     # Add edge repos tagged so that we can selectively install edge packages
-    echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
+    echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
     apk add --no-cache --update apk-tools musl ca-certificates
 
@@ -97,7 +97,7 @@ RUN set -xe && \
       make -j$(getconf _NPROCESSORS_ONLN) && \
       make install ) && \
     rm -rf $ERL_TOP && \
-    find /usr/local -regex '/usr/local/lib/erlang/\(lib/\|erts-\).*/\(man\|doc\|src\|info\|examples\)' | xargs rm -rf && \
+    find /usr/local -regex '/usr/local/lib/erlang/\(lib/\|erts-\).*/\(man\|doc\|obj\|c_src\|emacs\|info\|examples\)' | xargs rm -rf && \
     rm -rf /usr/local/lib/erlang/lib/*test* \
       /usr/local/lib/erlang/usr \
       /usr/local/lib/erlang/misc \
