@@ -19,7 +19,7 @@ WORKDIR /tmp/erlang-build
 # Update Alpine base libs
 RUN set -xe && \
     # Add edge repos tagged so that we can selectively install edge packages
-    echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
+    echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
     apk add --no-cache --update apk-tools musl ca-certificates
 
