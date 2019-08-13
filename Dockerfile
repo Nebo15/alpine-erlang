@@ -1,4 +1,4 @@
-FROM alpine:3.10.1
+FROM alpine:3.9.4
 MAINTAINER Nebo #15 <support@nebo15.com>
 
 # Important! Update this no-op ENV variable when this Dockerfile
@@ -21,7 +21,9 @@ RUN set -xe && \
     # Add edge repos tagged so that we can selectively install edge packages
     echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
-    apk add --no-cache --update apk-tools musl ca-certificates
+    apk add --no-cache --update apk-tools musl ca-certificates && \
+    # Fix broken version for Erlang build deps
+    apk add --no-cache --update musl=1.1.20-r5 musl-dev=1.1.20-r5
 
 # Install Erlang
 RUN set -xe && \
