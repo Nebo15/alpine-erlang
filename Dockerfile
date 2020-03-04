@@ -1,4 +1,4 @@
-FROM alpine:3.10.2
+FROM alpine:3.11.3
 MAINTAINER Nebo #15 <support@nebo15.com>
 
 # Important! Update this no-op ENV variable when this Dockerfile
@@ -11,8 +11,8 @@ ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=22.1.3 \
-    OTP_DOWNLOAD_SHA256=53a828c1199a41cb54bd3bc6c2c49af977a8834e702c030a5ea34013a3fcacdd
+    OTP_VERSION=22.2.8 \
+    OTP_DOWNLOAD_SHA256=71f73ddd59db521928a0f6c8d4354d6f4e9f4bfbd0b40d321cd5253a6c79b095
 
 WORKDIR /tmp/erlang-build
 
