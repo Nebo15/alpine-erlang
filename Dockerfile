@@ -1,18 +1,18 @@
-FROM alpine:3.11.3
+FROM alpine:3.12.0
 MAINTAINER Nebo #15 <support@nebo15.com>
 
 # Important! Update this no-op ENV variable when this Dockerfile
 # is updated with the current date. It will force refresh of all
 # of the base images and things like `apt-get update` won't be using
 # old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT=2019-10-12
+ENV REFRESHED_AT=2020-08-28
 
 ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=22.2.8 \
-    OTP_DOWNLOAD_SHA256=71f73ddd59db521928a0f6c8d4354d6f4e9f4bfbd0b40d321cd5253a6c79b095
+    OTP_VERSION=23.0.3 \
+    OTP_DOWNLOAD_SHA256=ed3c25742a2b76407dbb83d40cb95211caad5ab0969681f585a674e2e54840ac
 
 WORKDIR /tmp/erlang-build
 
