@@ -1,17 +1,17 @@
-FROM alpine:3.12.1
+FROM alpine:3.13.5
 
 # Important! Update this no-op ENV variable when this Dockerfile
 # is updated with the current date. It will force refresh of all
 # of the base images and things like `apt-get update` won't be using
 # old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT=2020-11-23
+ENV REFRESHED_AT=2021-05-12
 
 ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=23.1.4 \
-    OTP_DOWNLOAD_SHA256=8f6718b82bbca72d7dfe0b0de10b6e043cefe9e5ac08d3f84e18f8522d794967
+    OTP_VERSION=24.0 \
+    OTP_DOWNLOAD_SHA256=3d075006fb3832940843b6f12baaa6d1f36cadcd646be18ab2546db9c317e399
 
 WORKDIR /tmp/erlang-build
 
@@ -24,7 +24,7 @@ RUN set -xe && \
 
 # Install Erlang
 RUN set -xe && \
-    OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" && \
+    OTP_DOWNLOAD_URL="https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" && \
     # Create default user and home directory, set owner to default
     mkdir -p ${HOME} && \
     adduser -s /bin/sh -u 1001 -G root -h ${HOME} -S -D default && \
