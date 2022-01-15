@@ -1,4 +1,4 @@
-FROM alpine:3.13.5
+FROM alpine:3.15.0
 
 # Important! Update this no-op ENV variable when this Dockerfile
 # is updated with the current date. It will force refresh of all
@@ -10,8 +10,8 @@ ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=23.3.4 \
-    OTP_DOWNLOAD_SHA256=e19e6e0eebcee3b6165db33a8f7cea7d70c5b98ea41bd336a6fe26ddf775a2bb
+    OTP_VERSION=23.3.4.10 \
+    OTP_DOWNLOAD_SHA256=5dd75f5032b0c13193620981b901e6277af9dfd8e6e7a7cbee51b8a6448acd19
 
 WORKDIR /tmp/erlang-build
 
@@ -35,18 +35,17 @@ RUN set -xe && \
     apk add --no-cache --update --virtual .build-deps \
       build-base \
       dpkg-dev dpkg \
-      pcre \
-      openssl-dev \
-      ncurses-dev \
-      zlib-dev \
       gcc g++ libc-dev \
       linux-headers \
-      perl-dev \
       make \
       autoconf \
+      ncurses-dev \
+      openssl-dev \
       unixodbc-dev \
       lksctp-tools-dev \
-      tar && \
+      tar \
+      pcre \
+      zlib-dev && \
     # Download Erlang/OTP
     curl -fSL -o otp-src.tar.gz "${OTP_DOWNLOAD_URL}" && \
     echo "$OTP_DOWNLOAD_SHA256  otp-src.tar.gz" | sha256sum -c - && \
@@ -77,7 +76,6 @@ RUN set -xe && \
         --without-cosProperty \
         --without-cosTime \
         --without-cosTransactions \
-        --without-dialyzer \
         --without-et \
         --without-gs \
         --without-ic \
@@ -91,12 +89,13 @@ RUN set -xe && \
         --enable-dynamic-ssl-lib \
         --enable-ssl=dynamic-ssl-lib \
         --enable-sctp \
-        --enable-hipe \
         --enable-dirty-schedulers && \
       make -j$(getconf _NPROCESSORS_ONLN) && \
       make install ) && \
     rm -rf $ERL_TOP && \
     find /usr/local -regex '/usr/local/lib/erlang/\(lib/\|erts-\).*/\(man\|doc\|obj\|c_src\|emacs\|info\|examples\)' | xargs rm -rf && \
+    find /usr/local -name src | xargs -r find | grep -v '\.hrl$' | xargs rm -v || true && \
+    find /usr/local -name src | xargs -r find | xargs rmdir -vp || true && \
     rm -rf /usr/local/lib/erlang/lib/*test* \
       /usr/local/lib/erlang/usr \
       /usr/local/lib/erlang/misc \
@@ -112,6 +111,8 @@ RUN set -xe && \
   	)" && \
     apk add --virtual .erlang-rundeps $runDeps lksctp-tools && \
     apk del .fetch-deps .build-deps && \
+    /usr/local/bin/erl -eval "beam_lib:strip_release('/usr/local/lib/erlang/lib')" -s init stop > /dev/null && \
+    (/usr/bin/strip /usr/local/lib/erlang/erts-*/bin/* || true) && \
     rm -rf /var/cache/apk/*
 
 # Update CA certificates
