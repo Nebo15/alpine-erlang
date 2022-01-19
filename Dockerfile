@@ -10,8 +10,8 @@ ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=24.1.7 \
-    OTP_DOWNLOAD_SHA256=20075d3e8c495e33b29763d0bba9a5bb274f0a8f4a31ff8d201cd9ea33d5e383
+    OTP_VERSION=24.2 \
+    OTP_DOWNLOAD_SHA256=af0f1928dcd16cd5746feeca8325811865578bf1a110a443d353ea3e509e6d41
 
 WORKDIR /tmp/erlang-build
 
@@ -88,14 +88,12 @@ RUN set -xe && \
         --enable-shared-zlib \
         --enable-dynamic-ssl-lib \
         --enable-ssl=dynamic-ssl-lib \
-        --enable-sctp \
-        --enable-dirty-schedulers && \
+        --enable-sctp && \
       make -j$(getconf _NPROCESSORS_ONLN) && \
       make install ) && \
-    rm -rf $ERL_TOP && \
     find /usr/local -regex '/usr/local/lib/erlang/\(lib/\|erts-\).*/\(man\|doc\|obj\|c_src\|emacs\|info\|examples\)' | xargs rm -rf && \
-    find /usr/local -name src | xargs -r find | grep -v '\.hrl$' | xargs rm -v || true && \
-    find /usr/local -name src | xargs -r find | xargs rmdir -vp || true && \
+    (find /usr/local -name src | xargs -r find | grep -v '\.hrl$' | xargs rm -v || true) && \
+    (find /usr/local -name src | xargs -r find | xargs rmdir -vp || true) && \
     rm -rf /usr/local/lib/erlang/lib/*test* \
       /usr/local/lib/erlang/usr \
       /usr/local/lib/erlang/misc \
@@ -109,11 +107,14 @@ RUN set -xe && \
   			| sort -u \
   			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
   	)" && \
-    apk add --virtual .erlang-rundeps $runDeps lksctp-tools && \
+    apk add --virtual .erlang-rundeps $runDeps lksctp-tools ca-certificates && \
     apk del .fetch-deps .build-deps && \
-    /usr/local/bin/erl -eval "beam_lib:strip_release('/usr/local/lib/erlang/lib')" -s init stop > /dev/null && \
-    (/usr/bin/strip /usr/local/lib/erlang/erts-*/bin/* || true) && \
-    rm -rf /var/cache/apk/*
+    rm -rf /var/cache/apk/* && \
+    rm -rf $ERL_TOP && \
+    rm -rf /tmp/erlang-build
+
+RUN (erl -eval "beam_lib:strip_release('/usr/local/lib/erlang/lib')" -s init stop > /dev/null) && \
+    (/usr/bin/strip /usr/local/lib/erlang/erts-*/bin/* || true)
 
 # Update CA certificates
 RUN update-ca-certificates --fresh
