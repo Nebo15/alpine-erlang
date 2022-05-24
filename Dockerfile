@@ -1,17 +1,17 @@
-FROM alpine:3.15.0
+FROM alpine:3.15.4
 
 # Important! Update this no-op ENV variable when this Dockerfile
 # is updated with the current date. It will force refresh of all
 # of the base images and things like `apt-get update` won't be using
 # old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT=2021-05-12
+ENV REFRESHED_AT=2022-05-22
 
 ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=24.2 \
-    OTP_DOWNLOAD_SHA256=af0f1928dcd16cd5746feeca8325811865578bf1a110a443d353ea3e509e6d41
+    OTP_VERSION=25.0 \
+    OTP_DOWNLOAD_SHA256=2d7678c9bc6fcf3a1242c4d1c3864855d85e73ade792cd80adb8a9f379996711
 
 WORKDIR /tmp/erlang-build
 
@@ -60,6 +60,7 @@ RUN set -xe && \
       ./otp_build autoconf && \
       ./configure \
         --build="$gnuArch" \
+        --host="$gnuArch" \
         --prefix=/usr/local \
         --sysconfdir=/etc \
         --mandir=/usr/share/man \
