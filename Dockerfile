@@ -1,17 +1,17 @@
-FROM alpine:3.16.0
+FROM alpine:3.16.2
 
 # Important! Update this no-op ENV variable when this Dockerfile
 # is updated with the current date. It will force refresh of all
 # of the base images and things like `apt-get update` won't be using
 # old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT=2022-05-22
+ENV REFRESHED_AT=2022-07-29
 
 ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=25.0 \
-    OTP_DOWNLOAD_SHA256=2d7678c9bc6fcf3a1242c4d1c3864855d85e73ade792cd80adb8a9f379996711
+    OTP_VERSION=25.0.4 \
+    OTP_DOWNLOAD_SHA256=05878cb51a64b33c86836b12a21903075c300409b609ad5e941ddb0feb8c2120
 
 WORKDIR /tmp/erlang-build
 
@@ -24,7 +24,7 @@ RUN set -xe && \
 
 # Install Erlang
 RUN set -xe && \
-    OTP_DOWNLOAD_URL="https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz" && \
+    OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" && \
     # Create default user and home directory, set owner to default
     mkdir -p ${HOME} && \
     adduser -s /bin/sh -u 1001 -G root -h ${HOME} -S -D default && \
@@ -54,12 +54,11 @@ RUN set -xe && \
     tar -xzf otp-src.tar.gz -C $ERL_TOP --strip-components=1 && \
     rm otp-src.tar.gz && \
     ( cd $ERL_TOP && \
-      # export OTP_SMALL_BUILD=true && \
-      export CPPFlAGS="-D_BSD_SOURCE $CPPFLAGS" && \
-      export gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" && \
+      export gnuBuildArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" && \
+      export gnuArch="$(dpkg-architecture --query DEB_HOST_GNU_TYPE)" && \
       ./otp_build autoconf && \
       ./configure \
-        --build="$gnuArch" \
+        --build="$gnuBuildArch" \
         --host="$gnuArch" \
         --prefix=/usr/local \
         --sysconfdir=/etc \
