@@ -51,6 +51,10 @@ RUN set -xe && \
     echo "$OTP_DOWNLOAD_SHA256  otp-src.tar.gz" | sha256sum -c - && \
     export ERL_TOP="/usr/src/otp_src_${OTP_VERSION%%@*}" && \
     mkdir -vp $ERL_TOP && \
+    # Note: if your x86_64 host fails to untar during multiarch build run:
+    #
+    #   docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    #
     tar -xzf otp-src.tar.gz -C $ERL_TOP --strip-components=1 && \
     rm otp-src.tar.gz && \
     ( cd $ERL_TOP && \
