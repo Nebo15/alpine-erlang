@@ -1,17 +1,17 @@
-FROM alpine:3.16.2
+FROM alpine:3.17.3
 
 # Important! Update this no-op ENV variable when this Dockerfile
 # is updated with the current date. It will force refresh of all
 # of the base images and things like `apt-get update` won't be using
 # old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT=2022-07-29
+ENV REFRESHED_AT=2023-04-04
 
 ENV LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    OTP_VERSION=25.0.4 \
-    OTP_DOWNLOAD_SHA256=05878cb51a64b33c86836b12a21903075c300409b609ad5e941ddb0feb8c2120
+    OTP_VERSION=25.3 \
+    OTP_DOWNLOAD_SHA256=85c447efc1746740df4089d75bc0e47b88d5161d7c44e9fc4c20fa33ea5d19d7
 
 WORKDIR /tmp/erlang-build
 
